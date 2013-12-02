@@ -6,8 +6,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import get_language, activate
-
-from django.contrib.auth.models import User
+from django.conf import settings
 
 from notification import backends
 
@@ -79,7 +78,7 @@ class NoticeSetting(models.Model):
     of a given type to a given medium.
     """
 
-    user = models.ForeignKey(User, verbose_name=_("user"))
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("user"))
     notice_type = models.ForeignKey(NoticeType, verbose_name=_("notice type"))
     medium = models.CharField(_("medium"), max_length=1, choices=NOTICE_MEDIA)
     send = models.BooleanField(_("send"))

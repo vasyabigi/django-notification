@@ -7,7 +7,6 @@ import cPickle as pickle
 
 from django.conf import settings
 from django.core.mail import mail_admins
-from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 
 from notification.lockfile import FileLock, AlreadyLocked, LockTimeout
@@ -47,13 +46,13 @@ def send_all(*args):
                 notices = pickle.loads(str(queued_batch.pickled_data).decode("base64"))
                 for user, label, extra_context, sender in notices:
                     try:
-                        user = User.objects.get(pk=user)
+                        user = settings.AUTH_USER_MODEL.objects.get(pk=user)
                         logging.info("emitting notice {} to {}".format(label, user))
                         # call this once per user to be atomic and allow for logging to
                         # accurately show how long each takes.
                         if notification.send_now([user], label, extra_context, sender):
                             sent_actual += 1
-                    except User.DoesNotExist:
+                    except settings.AUTH_USER_MODEL.DoesNotExist:
                         # Ignore deleted users, just warn about them
                         logging.warning(
                             "not emitting notice {} to user {} since it does not exist".format(
